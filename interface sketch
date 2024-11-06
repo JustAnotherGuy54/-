@@ -16,7 +16,7 @@ c.create_polygon(0,70, 1000,70, 1000,0, 0,0, fill='#9c6a75', width=5)
 c.create_polygon(0,70, 150,70, 150,600, 0,600, fill='#9c6a75', width=5)
 c.create_polygon(1000,70, 800,70, 800,600, 1000,600, fill='#9c6a75', width=5)
 
-c.create_text(600, 35, text="Что посмотрим сегодня?", font=font1, fill="#242424")
+c.create_text(650, 35, text="Привет! Что посмотрим сегодня?", font=font1, fill="#242424")
 c.create_text(70, 95, text="Быстрый поиск\nпо жанрам", font=font2, fill="#242424")
 c.create_text(870, 95, text="Настраиваемый\nпоиск", font=font2, fill="#242424")
 
