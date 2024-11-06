@@ -3,7 +3,8 @@ import tkinter as tk
 root = tk.Tk()
 root.title("Выбор жанра")
 root.geometry("720x480")
-
+welcome_label = tk.Label(root, text="Привет , ты попал  в Фильмотеку !! Смотри и выбирай свои любимые фильмы ", font=("Arial", 18))
+welcome_label.pack(pady=10)  
 genre_frame = tk.Frame(root)
 genre_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
