@@ -79,7 +79,7 @@ def on_select_studio(event):
     print("выбери студию",selected_studio)
 btn =tk.Button(root,text=" Применить",font="Arial 12")
 btn.place(relx=0.85,rely=0.51)
-# Привязываем функции к событиям выбора года и режиссера
+# Привязка функции к событиям выбора года,режиссера,страны,возрастной категории,студии
 year_dropdown.bind("<<ComboboxSelected>>", on_select_year)
 director_dropdown.bind("<<ComboboxSelected>>", on_select_director)
 country_dropdown.bind("<<ComboboxSelected>>",on_select_country)
