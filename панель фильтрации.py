@@ -23,10 +23,10 @@ label= tk.Label(root, text= "Фильтры:",font="Arial 17")
 label.place(relx=0.85,rely=0.11)
 label_year = tk.Label(root, text="Год выпуска")
 label_year.place(relx=0.85,rely=0.16)
-# Создаем Combobox для выбора года
+# Создаем Combobox для выбора года режиссера страны студии возрастной категории 
 
 year_var = tk.StringVar(root)
-year_var.set(years[0])  # Устанавливаем начальное значение
+year_var.set(years[0])  
 year_dropdown = ttk.Combobox(root, textvariable=year_var, values=years)
 year_dropdown.place(relx=0.85, rely=0.19)
 
