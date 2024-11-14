@@ -3,53 +3,46 @@ from tkinter import ttk
 from tkinter import font
 from tkinter import Button
 import pandas
+import random
 
 db = pandas.read_excel('./тестю.xlsx', sheet_name='Фильмы')
-dBan = db.copy()
-dLove = db.copy()
 list = db.values.tolist()
 def filter_genre(genre):
     df = db[db['Жанр'].isin([genre])]
     list_data = df.values.tolist()
-    # Очистить существующие записи в tree и добавить новые
+    update_treeview(list_data)
+
+def update_treeview(data):
     for item in tree.get_children():
         tree.delete(item)
-    for row in list_data:
+    for row in data:
         tree.insert("", END, values=row)
 
 def on_double_click(event):
     def deletefilm():
-       print('puk')
-       dBan.loc[len(db.index)] = [item_values]
-       db.drop(selected_item)
-
-       #db.loc[len(db.index)] = [nameEntry.get(), genreEntry.get(), yearEntry.get(), ageEntry.get(), studioEntry.get(), longEntry.get(), contEntry.get(), prodEntry.get(), countryEntry.get(), rateEntry.get()]
-       #tree.detach(item_values)
-       #dBan.loc[len(db.index)-1] = [item_values] 
+       index = tree.index(selected_item)
+       db.at[index, 'Бан'] = 1
+       update_treeview(db.values.tolist())
         
-    with pandas.ExcelWriter("./output.xlsx") as writer:
-        dBan.to_excel(writer, sheet_name="Бан",index = False)
-        dLove.to_excel(writer, sheet_name="Нравится",index = False)
-
     def lovefilm():
-       print('kak')
+       index = tree.index(selected_item)
+       db.at[index, 'Нравится'] = 1  # Обновляем столбец 'Нравится' на 1
+       update_treeview(db.values.tolist())
+
     movieinfo = Tk()
     movieinfo.title("Информация о фильме")
     movieinfo.geometry('600x600')
-    
     label_font = ("Arial", 11, "bold")
     entry_font = ("Arial", 11)
     label_bg = '#FFCF9D'
     entry_bg = '#f7f1f1'
-    
-    # Холст для отображения элементов
     movieinfoC = Canvas(movieinfo, width=600, height=600, bg='#FFB26F')
     movieinfoC.pack(fill='both', expand=True)
-        
-    selected_item = tree.selection()[0]  # Получаем ID выбранной строки
-    item_values = tree.item(selected_item, 'values')  # Получаем значения строки
-    print("Выбранный фильм:", item_values)
-    # Создаем кнопки
+    # placeholder = PhotoImage(file="placeholder.png")
+    # placeholder1 = logo.subsample(3,3)
+    # movieinfoC.create_image(160, 35, image=placeholder)
+    selected_item = tree.selection()[0] 
+    item_values = tree.item(selected_item, 'values')
     btn_recommend = Button(movieinfo, text='Нравится', command=lovefilm, width=10, padx=30, pady=10, activebackground='#805962', bg='lime')
     btn_recommend.place(x=450, y=500)
     
@@ -81,7 +74,7 @@ def addfilm():
    
    genreLabel = Label(addfcan, text='Жанр:', font=label_font, bg=label_bg, anchor="w", width=17, padx=10)
    genreLabel.place(x=30, y=100)
-   genreEntry = ttk.Combobox(addfcan, font=entry_font, state="normal", width=17, values=['Драма', 'Комедия', 'Фантиастика', 'Ужасы', 'Приключения', 'Боевик'])
+   genreEntry = ttk.Combobox(addfcan, font=entry_font, state="normal", width=17, values=['Драма', 'Комедия', 'Фантиастика', 'Ужасы', 'Приключения', 'Боевик', ])
    genreEntry.place(x=232, y=100)
    
    yearLabel = Label(addfcan, text='Год создания:', font=label_font, bg=label_bg, anchor="w", width=17, padx=10)
@@ -126,6 +119,18 @@ def addfilm():
    
    btn2 = Button(addfcan, text='Добавить фильм', font=label_font, bg=label_bg, anchor="w", command=submitFilm, height=5, width=15, padx=30, pady=10, activebackground='#805962')
    btn2.pack(side='bottom')
+
+def filter_love():
+    df_love = db[db['Нравится'] == 1]
+    list_data_love = df_love.values.tolist()
+    random_rows = random.sample(list, 3)
+    combined_list = list_data_love + random_rows
+    update_treeview(combined_list)
+
+def filter_ban():
+    df = db[db['Бан'] == 1]
+    list_data = df.values.tolist()
+    update_treeview(list_data)
 
 window = Tk()
 window.title("Filmoteka")
@@ -201,13 +206,8 @@ c.create_image(160, 35, image=logo1)
 
 btn = Button(c, text='Добавить фильм', command=addfilm, width=10, padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
 btn.place(x=840,y=550)
-btn = Button(c, text='Порекомендовать', command=addfilm, width=10, padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
-btn.place(x=840,y=500)
-btn = Button(c, text='Банлист', command=addfilm, width=10,padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
-btn.place(x=840,y=450)
-
-with pandas.ExcelWriter("./output.xlsx") as writer:
-    db.to_excel(writer, sheet_name="Фильмы")
-    dBan.to_excel(writer, sheet_name="Бан")
-    dLove.to_excel(writer, sheet_name="Нравится")
+btnRec = Button(c, text='Порекомендовать', command=filter_love, width=10, padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
+btnRec.place(x=840,y=500)
+btnBan = Button(c, text='Банлист', command=filter_ban, width=10,padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
+btnBan.place(x=840,y=450)
 window.mainloop()
