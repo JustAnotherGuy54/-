@@ -7,6 +7,12 @@ import random
 
 db = pandas.read_excel('./тестю.xlsx', sheet_name='Фильмы')
 list = db.values.tolist()
+# Фильтрация при поиске
+def search_movie(event):
+    search_text = str(search_entry.get()).lower()
+    filtered_data = [row for row in list if search_text in str(row[0]).lower()]
+    update_treeview(filtered_data)
+# Фильтрация по жанрам (слева)
 def filter_genre(genre):
     df = db[db['Жанр'].isin([genre])]
     list_data = df.values.tolist()
@@ -26,7 +32,7 @@ def on_double_click(event):
         
     def lovefilm():
        index = tree.index(selected_item)
-       db.at[index, 'Нравится'] = 1  # Обновляем столбец 'Нравится' на 1
+       db.at[index, 'Нравится'] = 1
        update_treeview(db.values.tolist())
 
     movieinfo = Tk()
@@ -38,9 +44,6 @@ def on_double_click(event):
     entry_bg = '#f7f1f1'
     movieinfoC = Canvas(movieinfo, width=600, height=600, bg='#FFB26F')
     movieinfoC.pack(fill='both', expand=True)
-    # placeholder = PhotoImage(file="placeholder.png")
-    # placeholder1 = logo.subsample(3,3)
-    # movieinfoC.create_image(160, 35, image=placeholder)
     selected_item = tree.selection()[0] 
     item_values = tree.item(selected_item, 'values')
     btn_recommend = Button(movieinfo, text='Нравится', command=lovefilm, width=10, padx=30, pady=10, activebackground='#805962', bg='lime')
@@ -48,12 +51,13 @@ def on_double_click(event):
     
     btn_blocklist = Button(movieinfo, text='Не нравится', command=deletefilm, width=10, padx=30, pady=10, activebackground='#805962', bg='red')
     btn_blocklist.place(x=450, y=450)
-
-
+# Второй экран с добавлением фильма
 def addfilm():
    def submitFilm():
     db.loc[len(db.index)] = [nameEntry.get(), genreEntry.get(), yearEntry.get(), ageEntry.get(), studioEntry.get(), longEntry.get(), contEntry.get(), prodEntry.get(), countryEntry.get(), rateEntry.get()]
     db.to_excel('./тестю.xlsx', sheet_name='Фильмы', index=False)
+    list = db.values.tolist()
+    update_treeview(list)
     newfilm.destroy()
 
    newfilm = Tk()
@@ -119,7 +123,7 @@ def addfilm():
    
    btn2 = Button(addfcan, text='Добавить фильм', font=label_font, bg=label_bg, anchor="w", command=submitFilm, height=5, width=15, padx=30, pady=10, activebackground='#805962')
    btn2.pack(side='bottom')
-
+# Фильтрация на фильмы которые нравятсяи не нравятся
 def filter_love():
     df_love = db[db['Нравится'] == 1]
     list_data_love = df_love.values.tolist()
@@ -132,6 +136,7 @@ def filter_ban():
     list_data = df.values.tolist()
     update_treeview(list_data)
 
+# Основное окно
 window = Tk()
 window.title("Filmoteka")
 window.geometry('1000x600')
@@ -139,8 +144,6 @@ c = Canvas( width=1000, height=600, bg='#241c1e')
 c.pack(fill='both', expand=True)
 left_frame = Frame(c, width=150, height=600, bg='#FFB26F')
 left_frame.place(x=0, y=73)
-#right_frame = Frame(c, width=160, height=600, bg='#9c6a75')
-#right_frame.place(x=805, y=75)
 center_frame = Frame(c, width=847, height=600, bg='#ffffff')
 center_frame.place(x=153, y=75)
 
@@ -149,16 +152,13 @@ font2 = font.Font(family="Arial", size=12, weight="bold", slant="roman")
 
 c.create_polygon(0,70, 1000,70, 1000,0, 0,0, fill='#FFB26F', width=5)
 c.create_polygon(0,70, 150,70, 150,600, 0,600, fill='#FFB26F', width=5)
-#c.create_polygon(1000,70, 800,70, 800,600, 1000,600, fill='#9c6a75', width=5)
 
-c.create_text(650, 35, text="Привет! Что посмотрим сегодня?", font=font1, fill="#242424")
+c.create_text(650, 20, text="Привет! Что посмотрим сегодня?", font=font1, fill="#242424")
 c.create_text(70, 95, text="Быстрый поиск\nпо жанрам", font=font2, fill="#242424")
 c.create_text(870, 95, text="Настраиваемый\nпоиск", font=font2, fill="#242424")
 
-
 c.create_line(0, 70, 1000, 70, fill='#b57650', width=5)
 c.create_line(150, 70, 150, 600, fill='#b57650', width=5)
-#c.create_line(800, 70, 800, 600, fill='#d4264f', width=5)
 
 button1 = Button(left_frame, text='Фантастика', width=15, height=1, activebackground='#805962', bg='#FFCF9D', command=lambda: filter_genre(button1['text']))
 button1.pack(side='top', pady=6, padx=15)
@@ -188,21 +188,26 @@ button13 = Button(left_frame, text='Криминал', width=15, height=1, activ
 button13.pack(side='top', pady=6, padx=15)
 button14 = Button(left_frame, text='Вестерн', width=15, height=1, activebackground='#805962', bg='#FFCF9D', command=lambda: filter_genre(button14['text']))
 button14.pack(side='top', pady=6, padx=15)
-
+# Список фильмов на центральном кадре
 columns = ("Название", "Жанр", "Год создания","Возрастная категория", "Студия", "Длительность", "Продолжения", "Режисер", "Страна", "Рейтинг", "Бан", "Нравится")
-tree = ttk.Treeview(center_frame, height=25, columns=columns, show=["headings"], displaycolumns=["Название", "Жанр", "Год создания","Возрастная категория", "Студия", "Длительность", "Продолжения", "Режисер", "Страна", "Рейтинг", "Бан"])
+tree = ttk.Treeview(center_frame, height=25, columns=columns, show=["headings"], displaycolumns=["Название", "Жанр", "Год создания","Возрастная категория", "Студия", "Длительность", "Продолжения", "Режисер", "Страна", "Рейтинг"])
 tree.pack(fill='y',expand=1)
 for col in columns:
    tree.heading(col, text=col)
-   tree.column(col,width=int(center_frame['width'] / 11))
+   tree.column(col,width=int(center_frame['width'] / 10))
 for i in range(len(db.index)):
    tree.insert("",END, values=list[i])
-
 tree.bind("<Double-1>", on_double_click)
 
 logo = PhotoImage(file="logo.png")
 logo1 = logo.subsample(3,3)
 c.create_image(160, 35, image=logo1)
+
+search_label = Label(c, text="Поиск по названию:", font=font2, bg='#FFB26F', anchor="w")
+search_label.place(x=350, y=40)
+search_entry = Entry(c, font=font2, width=40, bd=2, relief="solid")
+search_entry.place(x=520, y=40)
+search_entry.bind("<KeyRelease>", search_movie)
 
 btn = Button(c, text='Добавить фильм', command=addfilm, width=10, padx=30, pady=10,activebackground='#805962', bg='#FFCF9D')
 btn.place(x=840,y=550)
